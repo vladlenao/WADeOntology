@@ -1,0 +1,4 @@
+SPARQLWrapper==1.8.5  # For querying DBpedia
+rdflib==6.3.2         # For RDF manipulation
+Owlready2==0.39       # For ontology management in OWL format
+

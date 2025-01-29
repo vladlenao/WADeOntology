@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://example.org/ontology/"
+         xml:base="http://example.org/ontology/"
+         xmlns:owl="http://www.w3.org/2002/07/owl#"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:xml="http://www.w3.org/XML/1998/namespace"
+         xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+
+    <owl:Ontology rdf:about="http://example.org/ontology"/>
+
+    <!-- Classes -->
+    <owl:Class rdf:about="http://example.org/ontology/ProgrammingLanguage">
+        <rdfs:label>Programming Language</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.org/ontology/Framework">
+        <rdfs:label>Framework</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.org/ontology/Paradigm">
+        <rdfs:label>Paradigm</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.org/ontology/OperatingSystem">
+        <rdfs:label>Operating System</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.org/ontology/Repository">
+        <rdfs:label>Repository</rdfs:label>
+    </owl:Class>
+
+    <!-- Object Properties -->
+    <owl:ObjectProperty rdf:about="http://example.org/ontology/hasFramework">
+        <rdfs:domain rdf:resource="http://example.org/ontology/ProgrammingLanguage"/>
+        <rdfs:range rdf:resource="http://example.org/ontology/Framework"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.org/ontology/hasParadigm">
+        <rdfs:domain rdf:resource="http://example.org/ontology/ProgrammingLanguage"/>
+        <rdfs:range rdf:resource="http://example.org/ontology/Paradigm"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.org/ontology/runsOn">
+        <rdfs:domain rdf:resource="http://example.org/ontology/ProgrammingLanguage"/>
+        <rdfs:range rdf:resource="http://example.org/ontology/OperatingSystem"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.org/ontology/hasRepository">
+        <rdfs:domain rdf:resource="http://example.org/ontology/ProgrammingLanguage"/>
+        <rdfs:range rdf:resource="http://example.org/ontology/Repository"/>
+    </owl:ObjectProperty>
+
+    <!-- Data Properties -->
+    <owl:DatatypeProperty rdf:about="http://example.org/ontology/description">
+        <rdfs:domain rdf:resource="http://example.org/ontology/ProgrammingLanguage"/>
+        <rdfs:domain rdf:resource="http://example.org/ontology/Repository"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.org/ontology/createdBy">
+        <rdfs:domain rdf:resource="http://example.org/ontology/ProgrammingLanguage"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.org/ontology/released">
+        <rdfs:domain rdf:resource="http://example.org/ontology/ProgrammingLanguage"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.org/ontology/watchers">
+        <rdfs:domain rdf:resource="http://example.org/ontology/Repository"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.org/ontology/url">
+        <rdfs:domain rdf:resource="http://example.org/ontology/Repository"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+    </owl:DatatypeProperty>
+
+</rdf:RDF>

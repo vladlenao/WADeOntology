@@ -1,0 +1,17 @@
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dbp: <http://dbpedia.org/property/>
+
+SELECT DISTINCT
+    ?languageName
+    ?paradigm
+WHERE {
+    ?language a dbo:ProgrammingLanguage ;
+        rdfs:label ?languageName .
+
+    FILTER (lang(?languageName) = 'en')
+
+    OPTIONAL {
+            ?language dbp:paradigm ?paradigm
+    }
+}
