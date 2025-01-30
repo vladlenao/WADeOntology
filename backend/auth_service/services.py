@@ -1,12 +1,11 @@
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import jwt
-from models import User
-from pydantic import EmailStr
+from models import User, TokenBlacklist
 
 # Security settings
-SECRET_KEY = "your_secret_key"
+SECRET_KEY = "secret_key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -24,23 +23,32 @@ class AuthService:
     @staticmethod
     def create_access_token(data: dict, expires_delta: timedelta = None):
         to_encode = data.copy()
-        expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+        expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
         to_encode.update({"exp": expire})
         return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
     @staticmethod
-    def decode_access_token(token: str):
+    def decode_access_token(token: str, db: Session):
         try:
+            # Check if the token is blacklisted
+            blacklisted = db.query(TokenBlacklist).filter_by(token=token).first()
+            if blacklisted:
+                return {"error": "Token has been revoked"}
+
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             return payload
         except jwt.ExpiredSignatureError:
-            return None
-        except jwt.JWTError:
-            return None
+            return {"error": "Token has expired"}
+        except jwt.InvalidTokenError:
+            return {"error": "Invalid token"}
 
     @staticmethod
     def get_user_by_username(db: Session, username: str):
         return db.query(User).filter(User.username == username).first()
+
+    @staticmethod
+    def get_user_by_email(db: Session, email: str):
+        return db.query(User).filter(User.email == email).first()
 
     @staticmethod
     def create_user(db: Session, username: str, email: str, password: str):
@@ -50,3 +58,11 @@ class AuthService:
         db.commit()
         db.refresh(db_user)
         return db_user
+
+    @staticmethod
+    def logout(token: str, db: Session):
+        """Blacklist a token to log the user out"""
+        blacklisted_token = TokenBlacklist(token=token, revoked_at=datetime.now(timezone.utc))
+        db.add(blacklisted_token)
+        db.commit()
+        return {"message": "Logged out successfully"}
