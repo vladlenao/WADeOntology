@@ -1,5 +1,5 @@
 from .models import Question, Answer
-from ontology_service.owl_parser import OntologyService
+from ontology_service.src.services.ontology_services import OntologyService
 import psycopg2
 from psycopg2.extras import Json
 
