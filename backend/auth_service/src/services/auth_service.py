@@ -2,7 +2,8 @@ from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 import jwt
-from models import User, TokenBlacklist
+from ..models.user import User
+from ..models.token_blacklist import TokenBlacklist
 
 # Security settings
 SECRET_KEY = "secret_key"

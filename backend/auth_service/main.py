@@ -1,18 +1,17 @@
+import uvicorn
 from fastapi import FastAPI
-from contextlib import asynccontextmanager
-from routes import router as auth_router
-from database import create_tables
 
-# Define a lifespan function for startup/shutdown tasks
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    print("Creating tables...")
-    create_tables()  # Manually create tables
-    yield  # App is running
-    print("Shutting down...")
+from src.routes.auth_routes import router as auth_router
+from src.database.connection import engine, Base
 
-# Initialize FastAPI app with lifespan
-app = FastAPI(lifespan=lifespan)
+# Create database tables
+Base.metadata.create_all(bind=engine)
+
+# Initialize FastAPI application
+app = FastAPI(title="Authentication Service")
 
 # Include authentication routes
 app.include_router(auth_router)
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)
