@@ -56,6 +56,14 @@ router.post('/onto/query', isAuthenticated, (req, res) => {
     OntoController.handleQuery(req, res);
 });
 
+router.get('/onto/languages', isAuthenticated,(req, res) =>{
+    OntoController.renderLanguagesPage(req, res);
+});
+
+router.get('/onto/language/:language', isAuthenticated,(req, res) =>{
+    OntoController.renderLanguageDetails(req, res);
+});
+
 // Protected dashboard route
 router.get('/dashboard', isAuthenticated, (req, res) => {
     res.render('dashboard', {
@@ -63,5 +71,7 @@ router.get('/dashboard', isAuthenticated, (req, res) => {
         error: null
     });
 });
+
+
 
 module.exports = router;

@@ -82,6 +82,57 @@ class OntoController {
             });
         }
     }
+
+    static async renderLanguagesPage(req, res) {
+        try {
+            const languages = await OntologyService.getAllLanguages();
+
+            res.render('onto/languages', {
+                user: req.session.user,
+                languages,
+                error: null
+            });
+        } catch (error) {
+            console.error('Error loading languages:', error);
+            res.render('onto/languages', {
+                user: req.session.user,
+                languages: [],
+                error: error.message
+            });
+        }
+    }
+
+    static async renderLanguageDetails(req, res) {
+        try {
+            const language = req.params.language;
+            const [languages, languageInfo] = await Promise.all([
+                OntologyService.getAllLanguages(),
+                OntologyService.getCompleteLanguageInfo(language)
+            ]);
+
+            // Create language-details.ejs view if you haven't already
+            res.render('onto/language-details', {
+                user: req.session.user,
+                languages,
+                selectedLanguage: language,
+                details: languageInfo,
+                error: null
+            });
+        } catch (error) {
+            console.error('Error loading language details:', error);
+
+            // Try to get languages list even if details fail
+            const languages = await OntologyService.getAllLanguages().catch(() => []);
+
+            res.render('onto/language-details', {
+                user: req.session.user,
+                languages,
+                selectedLanguage: req.params.language,
+                details: null,
+                error: error.message
+            });
+        }
+    }
 }
 
 module.exports = OntoController;

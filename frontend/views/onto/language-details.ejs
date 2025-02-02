@@ -1,0 +1,132 @@
+<!-- views/onto/language-details.ejs -->
+<%- include('../partials/header') %>
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Language List Sidebar -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Programming Languages</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <% languages.forEach(function(lang) { %>
+                            <a href="/onto/language/<%= lang %>"
+                               class="list-group-item list-group-item-action <%= selectedLanguage === lang ? 'active' : '' %>">
+                                <%= lang %>
+                            </a>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Language Details -->
+        <div class="col-md-9">
+            <% if (error) { %>
+                <div class="alert alert-danger">
+                    <%= error %>
+                </div>
+            <% } %>
+
+            <% if (details) { %>
+                <!-- Language Info Card -->
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h4 class="mb-0"><%= selectedLanguage %> Details</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Basic Info -->
+                            <div class="col-md-12 mb-4">
+                                <% if (details.info) { %>
+                                    <% if (details.info.creator) { %>
+                                        <p><strong>Created by:</strong> <%= details.info.creator %></p>
+                                    <% } %>
+                                    <% if (details.info.released) { %>
+                                        <p><strong>Released:</strong> <%= details.info.released %></p>
+                                    <% } %>
+                                    <% if (details.info.description) { %>
+                                        <p><strong>Description:</strong> <%= details.info.description %></p>
+                                    <% } %>
+                                <% } %>
+                            </div>
+
+                            <!-- Paradigms -->
+                            <% if (details.paradigms && details.paradigms.length > 0) { %>
+                                <div class="col-md-6 mb-3">
+                                    <h5>Paradigms</h5>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <% details.paradigms.forEach(function(paradigm) { %>
+                                            <span class="badge bg-secondary"><%= paradigm %></span>
+                                        <% }); %>
+                                    </div>
+                                </div>
+                            <% } %>
+
+                            <!-- Frameworks -->
+                            <% if (details.frameworks && details.frameworks.length > 0) { %>
+                                <div class="col-md-6 mb-3">
+                                    <h5>Frameworks</h5>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <% details.frameworks.forEach(function(framework) { %>
+                                            <span class="badge bg-info"><%= framework %></span>
+                                        <% }); %>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Repositories Card -->
+                <% if (details.repositories && details.repositories.length > 0) { %>
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h4 class="mb-0">Related Repositories</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <% details.repositories.forEach(function(repo) { %>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <h5 class="card-title"><%= repo.name %></h5>
+                                                <% if (repo.description) { %>
+                                                    <p class="card-text text-muted small"><%= repo.description %></p>
+                                                <% } %>
+                                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                                    <span class="badge bg-primary">
+                                                        <i class="bi bi-eye-fill"></i> <%= repo.watchers %> watchers
+                                                    </span>
+                                                    <% if (repo.url) { %>
+                                                        <a href="<%= repo.url %>"
+                                                           target="_blank"
+                                                           class="btn btn-sm btn-outline-primary">
+                                                            View Repository
+                                                        </a>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            <% } else if (!error) { %>
+                <div class="card">
+                    <div class="card-body">
+                        <p class="lead text-center">
+                            Select a programming language from the list to view its details.
+                        </p>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

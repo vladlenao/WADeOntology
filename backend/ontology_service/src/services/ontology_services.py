@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Any
 from rdflib import Graph, Namespace, URIRef
 from fastapi import HTTPException
 
@@ -40,7 +40,7 @@ class OntologyService:
 
         return entity_uri
 
-    def bidirectional_query(self, entity: str, predicate: str, direction: str, limit: int = 10) -> List[Dict]:
+    def bidirectional_query(self, entity: str, predicate: str, direction: str, limit: int = 10) -> list[str]:
         """Perform bidirectional query on the ontology"""
         try:
             predicate_uri = self.get_predicate_uri(predicate)
@@ -70,29 +70,38 @@ class OntologyService:
 
             results = self.g.query(query)
 
-            return [
-                {
-                    "subject": str(row.subject),
-                    "predicate": str(row.predicate),
-                    "object": str(row.object)
-                }
-                for row in results
+            prefixesToRemove = [
+                "http://example.org/lang/",
+                "http://example.org/framework/",
+                "http://example.org/paradigm/",
+                "http://example.org/repo/",
+                "http://example.org/os/"
             ]
+
+            if direction == "forward":
+                results_list = []
+                return [next((str(row.object).replace(prefix, '') for prefix in prefixesToRemove if prefix in str(row.object)), str(row.object)) for row in results]
+            elif direction == "backward":
+                return [next((str(row.subject).replace(prefix, '') for prefix in prefixesToRemove if prefix in str(row.subject)), str(row.subject)) for row in results]
 
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Query execution failed: {str(e)}")
 
-    def get_available_predicates(self) -> List[str]:
+    def get_available_language_predicates(self) -> List[str]:
         """Get all available predicates in the ontology"""
         query = """
-        SELECT DISTINCT ?predicate
-        WHERE {
-            ?s ?predicate ?o .
-            FILTER(STRSTARTS(STR(?predicate), STR(myonto:)))
-        }
-        """
+                SELECT DISTINCT ?predicate
+                WHERE {
+                    ?s a myonto:ProgrammingLanguage .
+                    ?s ?predicate ?o .
+                    FILTER(STRSTARTS(STR(?predicate), STR(myonto:)))
+                }
+                """
         results = self.g.query(query)
-        return [str(result[0]) for result in results]
+
+        # Parse the URLs to get only the predicate names
+        return [str(result[0]).split('/')[-1] for result in results]
+
 
     def get_entity_relations(self, entity: str) -> Dict[str, List[Dict]]:
         """Get all relations (both forward and backward) for a given entity"""
@@ -137,3 +146,118 @@ class OntologyService:
 
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Query execution failed: {str(e)}")
+
+    def get_all_languages(self) -> List[str]:
+        """Get all programming languages"""
+        query = """
+        SELECT DISTINCT ?language
+        WHERE {
+            ?language a myonto:ProgrammingLanguage .
+        }
+        """
+        results = self.g.query(query)
+        prefixes_to_remove = ["http://example.org/lang/"]
+        return [next((str(row.language).replace(prefix, '')
+                      for prefix in prefixes_to_remove
+                      if prefix in str(row.language)),
+                     str(row.language))
+                for row in results]
+
+    def get_language_details(self, language: str) -> Dict[str, Any]:
+        """Get details for a specific language"""
+        try:
+            # Get paradigms
+            paradigm_query = f"""
+            SELECT ?paradigm
+            WHERE {{
+                lang:{language} myonto:hasParadigm ?paradigm .
+            }}
+            """
+
+            # Get frameworks
+            framework_query = f"""
+            SELECT ?framework
+            WHERE {{
+                lang:{language} myonto:hasFramework ?framework .
+            }}
+            """
+
+            os_query = f"""
+            SELECT ?os
+            WHERE {{
+                lang:{language} myonto:runsOn ?os .
+            }}
+            """
+
+            # Get basic info
+            info_query = f"""
+            SELECT ?creator ?released ?description
+            WHERE {{
+                OPTIONAL {{ lang:{language} myonto:createdBy ?creator . }}
+                OPTIONAL {{ lang:{language} myonto:released ?released . }}
+                OPTIONAL {{ lang:{language} myonto:description ?description . }}
+            }}
+            """
+
+            # Execute queries
+            paradigm_results = self.g.query(paradigm_query)
+            framework_results = self.g.query(framework_query)
+            os_results = self.g.query(os_query)
+            info_results = list(self.g.query(info_query))
+
+            prefixes = {
+                "paradigm": "http://example.org/paradigm/",
+                "framework": "http://example.org/framework/",
+                "os": "http://example.org/os/"
+            }
+
+            details = {
+                "paradigms": [str(row.paradigm).replace(prefixes["paradigm"], '')
+                              for row in paradigm_results],
+                "frameworks": [str(row.framework).replace(prefixes["framework"], '')
+                               for row in framework_results],
+                "operating_systems": [str(row.os).replace(prefixes["os"], '')
+                                      for row in os_results],
+                "info": {}
+            }
+
+            # Add basic info if available
+            if info_results:
+                result = info_results[0]
+                if result.creator:
+                    details["info"]["creator"] = str(result.creator)
+                if result.released:
+                    details["info"]["released"] = str(result.released)
+                if result.description:
+                    details["info"]["description"] = str(result.description)
+
+            return details
+
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+    def get_language_repositories(self, language: str) -> List[Dict[str, Any]]:
+        """Get repositories for a specific language"""
+        try:
+            query = f"""
+            SELECT DISTINCT ?repo ?name ?url ?description ?watchers
+            WHERE {{
+                lang:{language} myonto:hasRepository ?repo .
+                ?repo rdfs:label ?name .
+                OPTIONAL {{ ?repo myonto:url ?url . }}
+                OPTIONAL {{ ?repo myonto:description ?description . }}
+                OPTIONAL {{ ?repo myonto:watchers ?watchers . }}
+            }}
+            """
+
+            results = self.g.query(query)
+
+            return [{
+                "name": str(row.name),
+                "url": str(row.url) if row.url else None,
+                "description": str(row.description) if row.description else None,
+                "watchers": int(row.watchers) if row.watchers else 0
+            } for row in results]
+
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
