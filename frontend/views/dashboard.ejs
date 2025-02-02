@@ -1,0 +1,53 @@
+<!-- views/dashboard.ejs -->
+<%- include('partials/header') %>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">Dashboard</h1>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Welcome, <%= user.username %></h5>
+                    <p class="card-text">This is your personal dashboard.</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Quick Actions</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <a href="/onto/query" class="text-decoration-none">Make a New Query</a>
+                                </li>
+                                <!-- Add more actions as needed -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Account Info</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <strong>Username:</strong> <%= user.username %>
+                                </li>
+                                <% if (user.email) { %>
+                                <li class="list-group-item">
+                                    <strong>Email:</strong> <%= user.email %>
+                                </li>
+                                <% } %>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

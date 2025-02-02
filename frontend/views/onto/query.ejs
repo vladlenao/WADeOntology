@@ -1,0 +1,70 @@
+<%- include('../partials/header') %>
+
+<div class="card">
+    <div class="card-header">
+        <h2>Ontology Query</h2>
+    </div>
+    <div class="card-body">
+        <% if (error) { %>
+            <div class="alert alert-danger"><%= error %></div>
+        <% } %>
+        <form action="/onto/query" method="POST">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="entity" class="form-label">Entity</label>
+                        <input type="text" class="form-control" id="entity" name="entity" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="predicate" class="form-label">Predicate</label>
+                        <select class="form-select" id="predicate" name="predicate" required>
+                            <% predicates.forEach(function(predicate) { %>
+                                <option value="<%= predicate %>"><%= predicate %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="direction" class="form-label">Direction</label>
+                        <select class="form-select" id="direction" name="direction" required>
+                            <option value="forward">Forward</option>
+                            <option value="backward">Backward</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Query</button>
+        </form>
+
+        <% if (results && results.length > 0) { %>
+            <div class="mt-4">
+                <h3>Results</h3>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Predicate</th>
+                                <th>Object</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% results.forEach(function(result) { %>
+                                <tr>
+                                    <td><%= result.subject %></td>
+                                    <td><%= result.predicate %></td>
+                                    <td><%= result.object %></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
