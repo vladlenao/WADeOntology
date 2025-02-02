@@ -1,70 +1,139 @@
 <%- include('../partials/header') %>
 
-<div class="card">
-    <div class="card-header">
-        <h2>Ontology Query</h2>
-    </div>
-    <div class="card-body">
-        <% if (error) { %>
-            <div class="alert alert-danger"><%= error %></div>
-        <% } %>
-        <form action="/onto/query" method="POST">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="mb-3">
-                        <label for="entity" class="form-label">Entity</label>
-                        <input type="text" class="form-control" id="entity" name="entity" required>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="mb-3">
-                        <label for="predicate" class="form-label">Predicate</label>
-                        <select class="form-select" id="predicate" name="predicate" required>
-                            <% predicates.forEach(function(predicate) { %>
-                                <option value="<%= predicate %>"><%= predicate %></option>
-                            <% }); %>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="mb-3">
-                        <label for="direction" class="form-label">Direction</label>
-                        <select class="form-select" id="direction" name="direction" required>
-                            <option value="forward">Forward</option>
-                            <option value="backward">Backward</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Query</button>
-        </form>
+<div class="container py-4">
 
-        <% if (results && results.length > 0) { %>
-            <div class="mt-4">
-                <h3>Results</h3>
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Subject</th>
-                                <th>Predicate</th>
-                                <th>Object</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% results.forEach(function(result) { %>
-                                <tr>
-                                    <td><%= result.subject %></td>
-                                    <td><%= result.predicate %></td>
-                                    <td><%= result.object %></td>
-                                </tr>
-                            <% }); %>
-                        </tbody>
-                    </table>
+    <!-- Query Interface -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Query Builder</h4>
+        </div>
+        <div class="card-body">
+            <% if (error) { %>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <%= error %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% } %>
+
+            <form action="/onto/query" method="POST" class="needs-validation" novalidate>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="entity" class="form-label">Entity</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="entity"
+                                name="entity"
+                                required
+                                placeholder="Enter entity name"
+                                value="<%= query && query.entity || '' %>"
+                            >
+                            <div class="invalid-feedback">
+                                Please provide an entity.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="predicate" class="form-label">Predicate</label>
+                            <select class="form-select" id="predicate" name="predicate" required>
+                                <option value="">Choose predicate...</option>
+                                <% predicates.forEach(function(predicate) { %>
+                                    <option
+                                        value="<%= predicate %>"
+                                        <%= (query && query.predicate === predicate) ? 'selected' : '' %>
+                                    >
+                                        <%= predicate %>
+                                    </option>
+                                <% }); %>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select a predicate.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="direction" class="form-label">Direction</label>
+                            <select class="form-select" id="direction" name="direction" required>
+                                <option value="">Choose direction...</option>
+                                <option value="forward" <%= (query && query.direction === 'forward') ? 'selected' : '' %>>Forward</option>
+                                <option value="backward" <%= (query && query.direction === 'backward') ? 'selected' : '' %>>Backward</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select a direction.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Execute Query</button>
+                    <button type="reset" class="btn btn-secondary ms-2">Reset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <% if (results && results.length > 0) { %>
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">Query Results</h4>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <% results.forEach(function(result) { %>
+                        <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <%= result %>
+                            <button
+                                class="btn btn-sm btn-outline-primary"
+                                onclick="useAsNewQuery('<%= result %>')"
+                                type="button"
+                            >
+                                Use as New Query
+                            </button>
+                        </div>
+                    <% }); %>
                 </div>
             </div>
-        <% } %>
-    </div>
+        </div>
+    <% } %>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    });
+
+    // Reset form validation state when using reset button
+    const resetButton = document.querySelector('button[type="reset"]');
+    if (resetButton) {
+        resetButton.addEventListener('click', () => {
+            const form = resetButton.closest('form');
+            form.classList.remove('was-validated');
+        });
+    }
+});
+
+function useAsNewQuery(entity) {
+    document.getElementById('entity').value = entity;
+    document.getElementById('entity').focus();
+    // Scroll to the query form
+    document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
 
 <%- include('../partials/footer') %>

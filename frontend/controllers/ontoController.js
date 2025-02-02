@@ -1,47 +1,87 @@
 const OntologyService = require('../services/ontoService');
 
-class OntologyController {
+class OntoController {
     static async renderQueryPage(req, res) {
         try {
+            // Get predicates from the service
             const predicates = await OntologyService.getPredicates();
+
+            // Initial render without query parameters
             res.render('onto/query', {
-                predicates,
+                user: req.session.user,
+                predicates: predicates || [], // Ensure predicates is always an array
                 results: null,
-                error: null
+                error: null,
+                query: {} // Add empty query object for form
             });
         } catch (error) {
+            console.error('Error loading query page:', error);
             res.render('onto/query', {
+                user: req.session.user,
                 predicates: [],
                 results: null,
-                error: error.message
+                error: 'Failed to load predicates. Please try again.',
+                query: {} // Add empty query object for form
             });
         }
     }
 
     static async handleQuery(req, res) {
         try {
-            const { entity, predicate, direction, limit } = req.body;
+            const { entity, predicate, direction } = req.body;
+
+            // Get predicates for the form
+            const predicates = await OntologyService.getPredicates();
+
+            // Input validation
+            if (!entity || !predicate || !direction) {
+                return res.render('onto/query', {
+                    user: req.session.user,
+                    predicates,
+                    results: null,
+                    error: 'All fields are required',
+                    query: req.body // Send back the submitted data
+                });
+            }
+
+            // Get the query results
             const results = await OntologyService.queryBidirectional(
                 entity,
                 predicate,
-                direction,
-                limit
+                direction
             );
-            const predicates = await OntologyService.getPredicates();
+
+            if (!results || results.length === 0) {
+                throw new Error('No results found');
+            }
+
+            // Check if we got results
+            if (!Array.isArray(results)) {
+                throw new Error('Invalid response from query service');
+            }
 
             res.render('onto/query', {
+                user: req.session.user,
                 predicates,
                 results,
-                error: null
+                error: null,
+                query: req.body // Send back the submitted data
             });
         } catch (error) {
+            console.error('Query error:', error);
+
+            // Get predicates for the form
+            const predicates = await OntologyService.getPredicates().catch(() => []);
+
             res.render('onto/query', {
-                predicates: [],
+                user: req.session.user,
+                predicates,
                 results: null,
-                error: error.message
+                error: error.message || 'An error occurred while processing your query',
+                query: req.body // Send back the submitted data
             });
         }
     }
 }
 
-module.exports = OntologyController;
+module.exports = OntoController;
