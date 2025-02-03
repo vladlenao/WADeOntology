@@ -1,0 +1,99 @@
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+    <% if (error) { %>
+        <div class="alert alert-danger">
+            <%= error %>
+        </div>
+    <% } %>
+
+    <% if (resource) { %>
+        <div class="card">
+            <div class="card-header
+                <%= resource.type === 'language' ? 'bg-primary' :
+                    resource.type === 'framework' ? 'bg-info' :
+                    resource.type === 'paradigm' ? 'bg-secondary' :
+                    resource.type === 'repository' ? 'bg-warning' :
+                    'bg-success' %> text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><%= resource.name %></h4>
+                    <span class="badge bg-light text-dark">
+                        <%= resource.type.charAt(0).toUpperCase() + resource.type.slice(1) %>
+                    </span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <!-- Repository specific properties -->
+                <% if (resource.type === 'repository' && resource.properties) { %>
+                    <div class="mb-4">
+                        <% if (resource.properties.description) { %>
+                            <p class="lead"><%= resource.properties.description %></p>
+                        <% } %>
+                        <% if (resource.properties.watchers) { %>
+                            <p><strong>Watchers:</strong> <%= resource.properties.watchers %></p>
+                        <% } %>
+                        <% if (resource.properties.url) { %>
+                            <a href="<%= resource.properties.url %>"
+                               target="_blank"
+                               class="btn btn-primary">
+                                View Repository <i class="bi bi-box-arrow-up-right ms-1"></i>
+                            </a>
+                        <% } %>
+                        <hr>
+                    </div>
+                <% } %>
+
+                <!-- Forward Relations -->
+                <% if (resource.forwardRelations && resource.forwardRelations.length > 0) { %>
+                    <div class="mb-4">
+                        <h5>Forward Relations</h5>
+                        <div class="list-group">
+                            <% resource.forwardRelations.forEach(function(rel) { %>
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong><%= rel.predicate %>:</strong>
+                                            <p class="ms-2 mb-0">
+                                                <%= rel.objectName %>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                <% } %>
+
+                <!-- Backward Relations -->
+                <% if (resource.backwardRelations && resource.backwardRelations.length > 0) { %>
+                    <div>
+                        <h5>Backward Relations</h5>
+                        <div class="list-group">
+                            <% resource.backwardRelations.forEach(function(rel) { %>
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong><%= rel.predicate %>:</strong>
+                                            <p class="ms-2 mb-0">
+                                                <%= rel.subjectName %>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                <% } %>
+
+                <% if (!resource.forwardRelations?.length && !resource.backwardRelations?.length) { %>
+                    <div class="alert alert-info">
+                        No relations found for this resource.
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<%- include('../partials/footer') %>

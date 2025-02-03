@@ -133,6 +133,30 @@ class OntoController {
             });
         }
     }
+
+    static async renderResourceDetails(req, res) {
+        try {
+            const uri = req.query.uri;
+            if (!uri) {
+                throw new Error('Resource URI is required');
+            }
+
+            const resourceDetails = await OntologyService.getResourceDetails(uri);
+
+            res.render('onto/resource-details', {
+                user: req.session.user,
+                resource: resourceDetails,
+                error: null
+            });
+        } catch (error) {
+            console.error('Error loading resource details:', error);
+            res.render('onto/resource-details', {
+                user: req.session.user,
+                resource: null,
+                error: error.message || 'Failed to load resource details'
+            });
+        }
+    }
 }
 
 module.exports = OntoController;

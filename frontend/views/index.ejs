@@ -1,4 +1,3 @@
-<!-- views/index.ejs -->
 <%- include('partials/header') %>
 
 <div class="container py-5">
@@ -11,45 +10,67 @@
     <% if (locals.user) { %>
         <!-- Logged in view -->
         <div class="row justify-content-center">
-            <div class="col-md-8 text-center">
+            <div class="col-md-10 text-center">
                 <h1 class="display-4 mb-4">Welcome, <%= user.username %>!</h1>
-                <p class="lead mb-4">Access the ontology query system or view your dashboard below.</p>
+                <p class="lead mb-4">Explore our programming languages ontology through different interfaces.</p>
 
                 <div class="row mt-5">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h3 class="card-title">Ontology Query</h3>
-                                <p class="card-text">Explore and query the ontology database with our advanced query interface.</p>
+                                <div class="mb-3">
+                                    <i class="bi bi-search fs-1 text-primary"></i>
+                                </div>
+                                <h3 class="card-title">Query Builder</h3>
+                                <p class="card-text">Build custom queries to explore relationships between programming languages, frameworks, and more.</p>
                                 <a href="/onto/query" class="btn btn-primary">Start Querying</a>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="card h-100">
                             <div class="card-body">
+                                <div class="mb-3">
+                                    <i class="bi bi-code-square fs-1 text-success"></i>
+                                </div>
+                                <h3 class="card-title">Languages Explorer</h3>
+                                <p class="card-text">Browse programming languages, their frameworks, paradigms, and related repositories.</p>
+                                <a href="/onto/languages" class="btn btn-success">Explore Languages</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <i class="bi bi-grid-3x3-gap fs-1 text-info"></i>
+                                </div>
                                 <h3 class="card-title">Dashboard</h3>
-                                <p class="card-text">View your account dashboard and manage your settings.</p>
-                                <a href="/dashboard" class="btn btn-secondary">Go to Dashboard</a>
+                                <p class="card-text">Access your personal dashboard and manage your account settings.</p>
+                                <a href="/dashboard" class="btn btn-info text-white">Go to Dashboard</a>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     <% } else { %>
         <!-- Not logged in view -->
         <div class="row justify-content-center">
             <div class="col-md-8 text-center">
-                <h1 class="display-4 mb-4">Welcome to Ontology Query System</h1>
-                <p class="lead mb-4">Access our powerful ontology query system by logging in or creating a new account.</p>
+                <h1 class="display-4 mb-4">Programming Languages Ontology Explorer</h1>
+                <p class="lead mb-4">Discover relationships between programming languages, frameworks, paradigms, and repositories in our comprehensive ontology system.</p>
 
                 <div class="row mt-5">
                     <div class="col-md-6">
                         <div class="card h-100">
                             <div class="card-body">
+                                <div class="mb-3">
+                                    <i class="bi bi-person-circle fs-1 text-primary"></i>
+                                </div>
                                 <h3 class="card-title">Login</h3>
-                                <p class="card-text">Already have an account? Log in to access the query system.</p>
+                                <p class="card-text">Already have an account? Log in to explore our ontology system.</p>
                                 <a href="/auth/login" class="btn btn-primary">Login</a>
                             </div>
                         </div>
@@ -57,9 +78,12 @@
                     <div class="col-md-6">
                         <div class="card h-100">
                             <div class="card-body">
+                                <div class="mb-3">
+                                    <i class="bi bi-person-plus fs-1 text-success"></i>
+                                </div>
                                 <h3 class="card-title">Register</h3>
-                                <p class="card-text">New to the system? Create an account to get started.</p>
-                                <a href="/auth/register" class="btn btn-secondary">Register</a>
+                                <p class="card-text">New to the system? Create an account to start exploring.</p>
+                                <a href="/auth/register" class="btn btn-success">Register</a>
                             </div>
                         </div>
                     </div>

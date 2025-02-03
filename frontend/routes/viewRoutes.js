@@ -64,6 +64,11 @@ router.get('/onto/language/:language', isAuthenticated,(req, res) =>{
     OntoController.renderLanguageDetails(req, res);
 });
 
+router.get('/onto/resource', isAuthenticated, (req, res) => {
+    OntoController.renderResourceDetails(req, res);
+});
+
+
 // Protected dashboard route
 router.get('/dashboard', isAuthenticated, (req, res) => {
     res.render('dashboard', {
