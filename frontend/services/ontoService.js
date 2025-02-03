@@ -14,7 +14,7 @@ class OntologyService {
                     }
                 }
             );
-
+            print(response.data);
             return response.data;
         } catch (error) {
             throw new Error(error.response?.data?.detail || 'Query failed');

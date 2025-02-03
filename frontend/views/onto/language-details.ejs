@@ -1,4 +1,3 @@
-<!-- views/onto/language-details.ejs -->
 <%- include('../partials/header') %>
 
 <div class="container-fluid py-4">
@@ -41,13 +40,13 @@
                             <!-- Basic Info -->
                             <div class="col-md-12 mb-4">
                                 <% if (details.info) { %>
-                                    <% if (details.info.creator) { %>
+                                    <% if (details.info.creator && details.info.creator !== "None") { %>
                                         <p><strong>Created by:</strong> <%= details.info.creator %></p>
                                     <% } %>
-                                    <% if (details.info.released) { %>
+                                    <% if (details.info.released && details.info.released !== "None") { %>
                                         <p><strong>Released:</strong> <%= details.info.released %></p>
                                     <% } %>
-                                    <% if (details.info.description) { %>
+                                    <% if (details.info.description && details.info.description !== "None") { %>
                                         <p><strong>Description:</strong> <%= details.info.description %></p>
                                     <% } %>
                                 <% } %>
@@ -55,7 +54,7 @@
 
                             <!-- Paradigms -->
                             <% if (details.paradigms && details.paradigms.length > 0) { %>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <h5>Paradigms</h5>
                                     <div class="d-flex flex-wrap gap-2">
                                         <% details.paradigms.forEach(function(paradigm) { %>
@@ -67,11 +66,23 @@
 
                             <!-- Frameworks -->
                             <% if (details.frameworks && details.frameworks.length > 0) { %>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <h5>Frameworks</h5>
                                     <div class="d-flex flex-wrap gap-2">
                                         <% details.frameworks.forEach(function(framework) { %>
                                             <span class="badge bg-info"><%= framework %></span>
+                                        <% }); %>
+                                    </div>
+                                </div>
+                            <% } %>
+
+                            <!-- Operating Systems -->
+                            <% if (details.operatingSystems && details.operatingSystems.length > 0) { %>
+                                <div class="col-md-4 mb-3">
+                                    <h5>Operating Systems</h5>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <% details.operatingSystems.forEach(function(os) { %>
+                                            <span class="badge bg-success"><%= os %></span>
                                         <% }); %>
                                     </div>
                                 </div>
@@ -97,9 +108,13 @@
                                                     <p class="card-text text-muted small"><%= repo.description %></p>
                                                 <% } %>
                                                 <div class="d-flex justify-content-between align-items-center mt-3">
-                                                    <span class="badge bg-primary">
-                                                        <i class="bi bi-eye-fill"></i> <%= repo.watchers %> watchers
-                                                    </span>
+                                                    <% if (repo.watchers && repo.watchers > 0) { %>
+                                                        <span class="badge bg-primary">
+                                                            <i class="bi bi-eye-fill"></i> <%= repo.watchers %> watchers
+                                                        </span>
+                                                    <% } else { %>
+                                                        <span></span>
+                                                    <% } %>
                                                     <% if (repo.url) { %>
                                                         <a href="<%= repo.url %>"
                                                            target="_blank"

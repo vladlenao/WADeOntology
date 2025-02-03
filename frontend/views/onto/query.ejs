@@ -88,7 +88,8 @@
                 <div class="list-group">
                     <% results.forEach(function(result) { %>
                         <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <%= result %>
+                            <%= result.name %>
+                            <%= result.link%>
                             <button
                                 class="btn btn-sm btn-outline-primary"
                                 onclick="useAsNewQuery('<%= result %>')"
