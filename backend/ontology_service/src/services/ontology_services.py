@@ -40,7 +40,7 @@ class OntologyService:
 
         return entity_uri
 
-    def bidirectional_query(self, entity: str, predicate: str, direction: str, limit: int = 10) -> list[str]:
+    def bidirectional_query(self, entity: str, predicate: str, direction: str, limit: int = 20) -> list[dict[str, str]]:
         """Perform bidirectional query on the ontology"""
         try:
             predicate_uri = self.get_predicate_uri(predicate)
@@ -70,7 +70,7 @@ class OntologyService:
 
             results = self.g.query(query)
 
-            prefixesToRemove = [
+            prefixes_to_remove = [
                 "http://example.org/lang/",
                 "http://example.org/framework/",
                 "http://example.org/paradigm/",
@@ -78,11 +78,17 @@ class OntologyService:
                 "http://example.org/os/"
             ]
 
-            if direction == "forward":
-                results_list = []
-                return [next((str(row.object).replace(prefix, '') for prefix in prefixesToRemove if prefix in str(row.object)), str(row.object)) for row in results]
-            elif direction == "backward":
-                return [next((str(row.subject).replace(prefix, '') for prefix in prefixesToRemove if prefix in str(row.subject)), str(row.subject)) for row in results]
+            processed_names = []
+            obj_name = None
+            for row in results:
+                if direction == "forward":
+                    obj_name = str(row.object)
+                elif direction == "backward":
+                    obj_name = str(row.subject)
+                link = obj_name if obj_name.startswith('http') else ""
+                processed_name = next((obj_name.replace(prefix, '') for prefix in prefixes_to_remove if prefix in obj_name), obj_name)
+                processed_names.append({'link': link, 'name': processed_name})
+            return processed_names
 
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Query execution failed: {str(e)}")
@@ -146,6 +152,7 @@ class OntologyService:
 
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Query execution failed: {str(e)}")
+
 
     def get_all_languages(self) -> List[str]:
         """Get all programming languages"""
@@ -216,7 +223,7 @@ class OntologyService:
                               for row in paradigm_results],
                 "frameworks": [str(row.framework).replace(prefixes["framework"], '')
                                for row in framework_results],
-                "operating_systems": [str(row.os).replace(prefixes["os"], '')
+                "operatingSystems": [str(row.os).replace(prefixes["os"], '')
                                       for row in os_results],
                 "info": {}
             }

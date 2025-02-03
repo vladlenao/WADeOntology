@@ -1,7 +1,7 @@
 import logging
 
 from fastapi import APIRouter, Query
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Set
 
 from ..models.schemas import Direction, QueryResult, EntityRelations
 from ..services.ontology_services import OntologyService
@@ -11,7 +11,7 @@ router = APIRouter(prefix="/onto", tags=["Ontology"])
 # Initialize ontology service
 ontology_service = OntologyService("ontology/web_ontology.owl")
 
-@router.get("/query/", response_model=List[str])
+@router.get("/query/", response_model=List[Dict[str, str]])
 async def query_bidirectional(
         entity: str,
         predicate: str,
