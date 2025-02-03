@@ -4,6 +4,9 @@ const config = require("../config/config");
 class OntologyService {
     static async queryBidirectional(entity, predicate, direction, limit = 20) {
         try {
+            if (entity.includes("/") && entity.includes("github.com")) {
+                entity = entity.split("/").pop();
+            }
             const response = await axios.get(
                 `${config.ontoServiceUrl}/onto/query/`,
                 { params :{
